@@ -14,7 +14,7 @@ class Searchbar extends Component {
   handleSubmit = event => {
     event.preventDefault();
     if (this.state.searchName.trim() === '') {
-      alert('Input search');
+      alert('Введите название картинки для поиска');
       return;
     }
     this.props.onSubmit(this.state.searchName);

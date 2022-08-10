@@ -6,7 +6,7 @@ const ImageGalleryItem = ({ images }) => {
     <li key={data.id} className={css.ImageGalleryItem}>
       <img
         className={css.ImageGalleryItem_image}
-        src={data.webformatURL}
+        src={data.webImg}
         alt="some"
       />
     </li>

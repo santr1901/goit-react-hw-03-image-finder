@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+
 import css from './ImageGallery.module.css';
+
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
+import Loader from 'components/Loader/Loader';
+import Error from './Error/Error';
 
 const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = 'key=28107695-b6e67fe78ed729dbc6d2c568c';
@@ -9,29 +13,57 @@ const API_KEY = 'key=28107695-b6e67fe78ed729dbc6d2c568c';
 class ImageGallery extends Component {
   state = {
     images: [],
+    loading: false,
+    error: null,
   };
 
-  async componentDidMount() {
-    this.setState({ loading: true });
-    const response = await axios
-      .get(
-        `${BASE_URL}?q=${this.props.searchName}&page=1&${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      )
-      .finally(this.setState({ loading: false }));
+  async componentDidUpdate(prevProps) {
+    const prevSearchName = prevProps.searchName;
+    const searchName = this.props.searchName;
+    const prevPage = prevProps.page;
+    const realPage = this.props.page;
 
-    const imageData = response.data.hits.map(image => ({
-      id: image.id,
-      webformatURL: image.webformatURL,
-      largeImageURL: image.largeImageURL,
-    }));
-    this.setState({ images: imageData });
+    if (prevSearchName !== searchName || prevPage !== realPage) {
+      this.setState({ loading: true, error: false });
+
+      const allData = await axios
+        .get(
+          `${BASE_URL}?q=${searchName}&page=${realPage}&${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+        )
+        .then(response => {
+          return response.data.hits.map(image => ({
+            id: image.id,
+            webImg: image.webformatURL,
+            largeImg: image.largeImageURL,
+          }));
+        })
+        .catch(error => this.setState({ error }))
+        .finally(this.setState({ loading: false }));
+
+      this.setState({ images: allData });
+      // const imageData = response.data.hits.map(image => ({
+      //   id: image.id,
+      //   webformatURL: image.webformatURL,
+      //   largeImageURL: image.largeImageURL,
+      // }));
+      // console.log(imageData);
+      // this.setState(prevState => ({
+      //   images: [imageData, ...prevState.images],
+      // }));
+    }
   }
 
   render() {
+    const { images, loading, error } = this.state;
     return (
-      <ul className={css.ImageGallery}>
-        <ImageGalleryItem images={this.state.images} />
-      </ul>
+      <div>
+        {error && <Error searchName={this.props.searchName} />}
+        {loading && <Loader />}
+        <ul className={css.ImageGallery}>
+          <ImageGalleryItem images={images} />
+        </ul>
+        {images.length ? this.props.children : ''}
+      </div>
     );
   }
 }
