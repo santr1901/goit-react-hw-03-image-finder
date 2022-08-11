@@ -7,7 +7,9 @@ const ImageGalleryItem = ({ images }) => {
       <img
         className={css.ImageGalleryItem_image}
         src={data.webImg}
+        name={data.largeImg}
         alt="some"
+        id={data.id}
       />
     </li>
   ));

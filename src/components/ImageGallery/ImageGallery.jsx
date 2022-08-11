@@ -25,7 +25,9 @@ class ImageGallery extends Component {
 
     if (prevSearchName !== searchName || prevPage !== realPage) {
       this.setState({ loading: true, error: false });
-
+      if (prevSearchName !== searchName) {
+        this.setState({ images: [] });
+      }
       const allData = await axios
         .get(
           `${BASE_URL}?q=${searchName}&page=${realPage}&${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
@@ -40,16 +42,9 @@ class ImageGallery extends Component {
         .catch(error => this.setState({ error }))
         .finally(this.setState({ loading: false }));
 
-      this.setState({ images: allData });
-      // const imageData = response.data.hits.map(image => ({
-      //   id: image.id,
-      //   webformatURL: image.webformatURL,
-      //   largeImageURL: image.largeImageURL,
-      // }));
-      // console.log(imageData);
-      // this.setState(prevState => ({
-      //   images: [imageData, ...prevState.images],
-      // }));
+      this.setState(prevState => ({
+        images: [...prevState.images, ...allData],
+      }));
     }
   }
 
