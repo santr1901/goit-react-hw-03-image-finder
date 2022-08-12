@@ -23,29 +23,29 @@ class App extends Component {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
-  toogleModal = () => {
+  toggleModal = () => {
     this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
-  imageId = event => {
+  largeImg = event => {
+    console.log(event.target);
     if (event.target.nodeName === 'IMG') {
+      this.toggleModal();
       this.setState({ largeImg: event.target.name });
-      console.log(event.target.name);
-      this.toogleModal();
     }
   };
 
   render() {
     const { searchName, page, showModal, largeImg } = this.state;
     return (
-      <div className={css.app} onClick={this.imageId}>
+      <div className={css.app} onClick={this.largeImg}>
         <Searchbar onSubmit={this.handleFormSubmit} />
 
         <ImageGallery searchName={searchName} page={page} children>
           <LoadMoreBtn onLoadMore={this.loadMore} />
         </ImageGallery>
         {showModal && (
-          <Modal>
+          <Modal onClose={this.toggleModal}>
             <img
               width={600}
               height={500}
