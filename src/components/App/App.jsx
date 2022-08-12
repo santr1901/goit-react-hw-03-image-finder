@@ -28,7 +28,7 @@ class App extends Component {
   };
 
   largeImg = event => {
-    console.log(event.target);
+    console.log(event.target.tagName);
     if (event.target.nodeName === 'IMG') {
       this.toggleModal();
       this.setState({ largeImg: event.target.name });
