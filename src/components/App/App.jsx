@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import Searchbar from 'components/Searchbar/Searchbar';
 import ImageGallery from 'components/ImageGallery/ImageGallery';
-import LoadMoreBtn from 'components/Button/Button';
 import Modal from 'components/Modal/Modal';
 
 import css from './App.module.css';
@@ -27,22 +26,24 @@ class App extends Component {
     this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
-  largeImg = event => {
-    if (event.target.nodeName === 'IMG') {
-      this.toggleModal();
-      this.setState({ largeImg: event.target.name });
-    }
+  onImgModal = imgForModal => {
+    this.toggleModal();
+    this.setState({ largeImg: imgForModal });
   };
 
   render() {
     const { searchName, page, showModal, largeImg } = this.state;
     return (
-      <div className={css.app} onClick={this.largeImg}>
+      <div className={css.app}>
         <Searchbar onSubmit={this.handleFormSubmit} />
 
-        <ImageGallery searchName={searchName} page={page} children>
-          <LoadMoreBtn onLoadMore={this.loadMore} />
-        </ImageGallery>
+        <ImageGallery
+          searchName={searchName}
+          page={page}
+          onLoadMore={this.loadMore}
+          onImgClick={this.onImgModal}
+        />
+
         {showModal && (
           <Modal onClose={this.toggleModal}>
             <img

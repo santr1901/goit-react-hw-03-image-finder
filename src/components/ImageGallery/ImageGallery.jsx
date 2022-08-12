@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
 
 import css from './ImageGallery.module.css';
 
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 import Loader from 'components/Loader/Loader';
 import Error from './Error/Error';
-
-const BASE_URL = 'https://pixabay.com/api/';
-const API_KEY = 'key=28107695-b6e67fe78ed729dbc6d2c568c';
+import LoadMoreBtn from 'components/Button/Button';
+import { getImages } from 'services';
 
 class ImageGallery extends Component {
   state = {
@@ -17,7 +16,7 @@ class ImageGallery extends Component {
     error: null,
   };
 
-  async componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps) {
     const prevSearchName = prevProps.searchName;
     const searchName = this.props.searchName;
     const prevPage = prevProps.page;
@@ -28,23 +27,21 @@ class ImageGallery extends Component {
       if (prevSearchName !== searchName) {
         this.setState({ images: [] });
       }
-      const allData = await axios
-        .get(
-          `${BASE_URL}?q=${searchName}&page=${realPage}&${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-        )
+
+      getImages(searchName, realPage)
         .then(response => {
-          return response.data.hits.map(image => ({
+          let allData = response.map(image => ({
             id: image.id,
             webImg: image.webformatURL,
             largeImg: image.largeImageURL,
           }));
+
+          this.setState(prevState => ({
+            images: [...prevState.images, ...allData],
+          }));
         })
         .catch(error => this.setState({ error }))
         .finally(this.setState({ loading: false }));
-
-      this.setState(prevState => ({
-        images: [...prevState.images, ...allData],
-      }));
     }
   }
 
@@ -55,9 +52,13 @@ class ImageGallery extends Component {
         {error && <Error searchName={this.props.searchName} />}
         {loading && <Loader />}
         <ul className={css.ImageGallery}>
-          <ImageGalleryItem images={images} />
+          <ImageGalleryItem
+            images={images}
+            onImgClick={this.props.onImgClick}
+          />
         </ul>
-        {images.length ? this.props.children : ''}
+
+        {images.length && <LoadMoreBtn onLoadMore={this.props.onLoadMore} />}
       </div>
     );
   }
