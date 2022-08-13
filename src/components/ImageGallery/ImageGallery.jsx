@@ -57,8 +57,9 @@ class ImageGallery extends Component {
             onImgClick={this.props.onImgClick}
           />
         </ul>
-
-        {images.length && <LoadMoreBtn onLoadMore={this.props.onLoadMore} />}
+        {images.length !== 0 && (
+          <LoadMoreBtn onLoadMore={this.props.onLoadMore} />
+        )}
       </div>
     );
   }
